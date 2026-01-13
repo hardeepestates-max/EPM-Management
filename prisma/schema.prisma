@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  phone         String?
+  role          String    @default("TENANT")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  ownedProperties Property[]      @relation("PropertyOwner")
+  leases          Lease[]         @relation("TenantLease")
+  tickets         Ticket[]        @relation("TicketCreator")
+  ticketMessages  TicketMessage[]
+  documents       Document[]
+
+  @@map("users")
+}
+
+model Property {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  city        String
+  state       String
+  zipCode     String
+  description String?
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  ownerId   String
+  owner     User       @relation("PropertyOwner", fields: [ownerId], references: [id])
+  units     Unit[]
+  tickets   Ticket[]
+  documents Document[]
+
+  @@map("properties")
+}
+
+model Unit {
+  id         String   @id @default(cuid())
+  unitNumber String
+  bedrooms   Int
+  bathrooms  Float
+  sqft       Int?
+  rentAmount Float
+  status     String   @default("AVAILABLE")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  leases     Lease[]
+  tickets    Ticket[]
+
+  @@map("units")
+}
+
+model Lease {
+  id         String   @id @default(cuid())
+  startDate  DateTime
+  endDate    DateTime
+  rentAmount Float
+  deposit    Float?
+  status     String   @default("ACTIVE")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  unitId   String
+  unit     Unit      @relation(fields: [unitId], references: [id])
+  tenantId String
+  tenant   User      @relation("TenantLease", fields: [tenantId], references: [id])
+  payments Payment[]
+
+  @@map("leases")
+}
+
+model Ticket {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  category    String   @default("GENERAL")
+  priority    String   @default("MEDIUM")
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId     String
+  user       User            @relation("TicketCreator", fields: [userId], references: [id])
+  propertyId String?
+  property   Property?       @relation(fields: [propertyId], references: [id])
+  unitId     String?
+  unit       Unit?           @relation(fields: [unitId], references: [id])
+  messages   TicketMessage[]
+
+  @@map("tickets")
+}
+
+model TicketMessage {
+  id        String   @id @default(cuid())
+  message   String
+  createdAt DateTime @default(now())
+
+  // Relations
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+
+  @@map("ticket_messages")
+}
+
+model Payment {
+  id        String    @id @default(cuid())
+  amount    Float
+  dueDate   DateTime
+  paidDate  DateTime?
+  status    String    @default("PENDING")
+  stripeId  String?
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  leaseId String
+  lease   Lease  @relation(fields: [leaseId], references: [id])
+
+  @@map("payments")
+}
+
+model Document {
+  id                String    @id @default(cuid())
+  title             String
+  description       String?
+  fileUrl           String
+  fileType          String?
+  requiresSignature Boolean   @default(false)
+  signedAt          DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+
+  @@map("documents")
+}
