@@ -1,7 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Users, Wrench, FileText, Shield, Phone } from "lucide-react"
+import { Users, Wrench, FileText, Shield, Phone, Mail } from "lucide-react"
 
 export default function HomePage() {
   return (
@@ -194,6 +194,12 @@ export default function HomePage() {
                 <li className="flex items-center space-x-2">
                   <Phone className="h-4 w-4" />
                   <span>(201) 917-0689</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Mail className="h-4 w-4" />
+                  <a href="mailto:elevatepropertymanagement@outlook.com" className="hover:text-white">
+                    elevatepropertymanagement@outlook.com
+                  </a>
                 </li>
               </ul>
             </div>
