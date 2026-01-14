@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Users, Wrench, FileText, Shield, Phone, Mail } from "lucide-react"
+import { MobileNav } from "@/components/mobile-nav"
 
 export default function HomePage() {
   return (
@@ -11,15 +12,18 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <Image src="/logo.png" alt="EPM Logo" width={56} height={56} />
-              <span className="text-xl font-bold text-slate-900">Elevate Property Management</span>
+              <Image src="/logo.png" alt="EPM Logo" width={56} height={56} className="w-10 h-10 sm:w-14 sm:h-14" />
+              <span className="text-lg sm:text-xl font-bold text-slate-900">
+                <span className="hidden sm:inline">Elevate Property Management</span>
+                <span className="sm:hidden">Elevate PM</span>
+              </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <Link href="#services" className="text-slate-600 hover:text-slate-900">Services</Link>
               <Link href="#about" className="text-slate-600 hover:text-slate-900">About</Link>
               <Link href="#contact" className="text-slate-600 hover:text-slate-900">Contact</Link>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-4">
               <Link href="/login">
                 <Button variant="ghost">Sign In</Button>
               </Link>
@@ -27,6 +31,7 @@ export default function HomePage() {
                 <Button>Get Started</Button>
               </Link>
             </div>
+            <MobileNav />
           </div>
         </div>
       </nav>
