@@ -11,7 +11,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <Image src="/logo.png" alt="EPM Logo" width={48} height={48} />
+              <Image src="/logo.png" alt="EPM Logo" width={56} height={56} />
               <span className="text-xl font-bold text-slate-900">Elevate Property Management</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -32,27 +32,27 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-20 px-4">
+      <section className="py-16 px-4">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-4">
             Property Management
             <span className="text-blue-600"> Elevated</span>
           </h1>
-          <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-600 mb-6 max-w-2xl mx-auto">
             Professional property management services that put owners and tenants first.
             Over a decade of real estate expertise at your service.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/register">
               <Button size="lg" className="px-8">
                 Start Managing Today
               </Button>
             </Link>
-            <Link href="#contact">
+            <a href="#contact">
               <Button size="lg" variant="outline" className="px-8">
                 Contact Us
               </Button>
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -122,16 +122,8 @@ export default function HomePage() {
                   <div className="text-blue-100">Years Experience</div>
                 </div>
                 <div>
-                  <div className="text-4xl font-bold">500+</div>
-                  <div className="text-blue-100">Units Managed</div>
-                </div>
-                <div>
                   <div className="text-4xl font-bold">98%</div>
                   <div className="text-blue-100">Satisfaction Rate</div>
-                </div>
-                <div>
-                  <div className="text-4xl font-bold">24/7</div>
-                  <div className="text-blue-100">Support Available</div>
                 </div>
               </div>
             </div>
@@ -181,7 +173,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <Image src="/logo.png" alt="EPM Logo" width={40} height={40} className="brightness-0 invert" />
+                <Image src="/logo.png" alt="EPM Logo" width={48} height={48} className="brightness-0 invert" />
                 <span className="text-lg font-bold">Elevate Property Management</span>
               </div>
               <p className="text-slate-400">
@@ -208,8 +200,7 @@ export default function HomePage() {
             <div>
               <h4 className="font-semibold mb-4">Hours</h4>
               <p className="text-slate-400">
-                Mon-Fri: 9am - 6pm<br />
-                Emergency: 24/7
+                Everyday: 9am - 6pm
               </p>
             </div>
           </div>
