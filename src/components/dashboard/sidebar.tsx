@@ -18,6 +18,8 @@ import {
   Home,
   Wrench,
   Menu,
+  Receipt,
+  DollarSign,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -33,6 +35,8 @@ const adminNavItems: NavItem[] = [
   { title: "Users", href: "/dashboard/admin/users", icon: Users },
   { title: "Tickets", href: "/dashboard/admin/tickets", icon: Ticket },
   { title: "Payments", href: "/dashboard/admin/payments", icon: CreditCard },
+  { title: "Billing", href: "/dashboard/admin/billing", icon: DollarSign },
+  { title: "Invoices", href: "/dashboard/admin/invoices", icon: Receipt },
   { title: "Documents", href: "/dashboard/admin/documents", icon: FileText },
 ]
 
@@ -42,6 +46,7 @@ const ownerNavItems: NavItem[] = [
   { title: "Tenants", href: "/dashboard/owner/tenants", icon: Users },
   { title: "Tickets", href: "/dashboard/owner/tickets", icon: Ticket },
   { title: "Financials", href: "/dashboard/owner/financials", icon: CreditCard },
+  { title: "Invoices", href: "/dashboard/owner/invoices", icon: Receipt },
   { title: "Documents", href: "/dashboard/owner/documents", icon: FileText },
 ]
 

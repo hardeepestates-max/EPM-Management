@@ -8,21 +8,24 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String
-  name          String
-  phone         String?
-  role          String    @default("TENANT")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String
+  name            String
+  phone           String?
+  role            String    @default("TENANT")
+  stripeCustomerId String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // Relations
-  ownedProperties Property[]      @relation("PropertyOwner")
-  leases          Lease[]         @relation("TenantLease")
-  tickets         Ticket[]        @relation("TicketCreator")
-  ticketMessages  TicketMessage[]
-  documents       Document[]
+  ownedProperties  Property[]      @relation("PropertyOwner")
+  leases           Lease[]         @relation("TenantLease")
+  tickets          Ticket[]        @relation("TicketCreator")
+  ticketMessages   TicketMessage[]
+  documents        Document[]
+  billingSettings  OwnerBillingSettings?
+  invoices         Invoice[]
 
   @@map("users")
 }
@@ -126,15 +129,18 @@ model TicketMessage {
 }
 
 model Payment {
-  id        String    @id @default(cuid())
-  amount    Float
-  dueDate   DateTime
-  paidDate  DateTime?
-  status    String    @default("PENDING")
-  stripeId  String?
-  notes     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  amount          Float
+  dueDate         DateTime
+  paidDate        DateTime?
+  status          String    @default("PENDING")
+  stripePaymentId String?
+  paymentMethod   String?   // "card" or "ach"
+  convenienceFee  Float?    // Fee charged for card payments
+  totalPaid       Float?    // amount + convenienceFee
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // Relations
   leaseId String
@@ -161,4 +167,56 @@ model Document {
   property   Property? @relation(fields: [propertyId], references: [id])
 
   @@map("documents")
+}
+
+model OwnerBillingSettings {
+  id                    String   @id @default(cuid())
+  managementFeePercent  Float    @default(8.0)  // Default 8% management fee
+  billingDay            Int      @default(1)    // Day of month to generate invoice
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  ownerId String @unique
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  @@map("owner_billing_settings")
+}
+
+model Invoice {
+  id            String    @id @default(cuid())
+  invoiceNumber String    @unique
+  periodStart   DateTime
+  periodEnd     DateTime
+  subtotal      Float
+  totalAmount   Float
+  status        String    @default("PENDING") // PENDING, PAID, OVERDUE, CANCELLED
+  dueDate       DateTime
+  paidDate      DateTime?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  ownerId   String
+  owner     User              @relation(fields: [ownerId], references: [id])
+  lineItems InvoiceLineItem[]
+
+  @@map("invoices")
+}
+
+model InvoiceLineItem {
+  id          String   @id @default(cuid())
+  description String
+  quantity    Float    @default(1)
+  unitPrice   Float
+  amount      Float
+  type        String   // "management_fee", "flat_fee", "other"
+  createdAt   DateTime @default(now())
+
+  // Relations
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_line_items")
 }
