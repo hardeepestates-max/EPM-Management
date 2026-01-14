@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { stripe, calculateCardFee, ACH_FEE_AMOUNT } from "@/lib/stripe"
+import type Stripe from "stripe"
 
 export async function POST(request: Request) {
   try {
