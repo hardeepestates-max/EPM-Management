@@ -9,26 +9,28 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Navigation */}
       <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <Image src="/logo.png" alt="EPM Logo" width={56} height={56} className="w-10 h-10 sm:w-14 sm:h-14" />
-              <span className="text-lg sm:text-xl font-bold text-slate-900">
-                <span className="hidden sm:inline">Elevate Property Management</span>
-                <span className="sm:hidden">Elevate PM</span>
-              </span>
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center space-x-2">
+                <Image src="/logo.png" alt="EPM Logo" width={40} height={40} className="w-9 h-9 sm:w-10 sm:h-10" />
+                <span className="text-lg font-bold text-slate-900">
+                  <span className="hidden sm:inline">Elevate PM</span>
+                  <span className="sm:hidden">EPM</span>
+                </span>
+              </Link>
+              <div className="hidden md:flex items-center space-x-6 ml-10">
+                <Link href="#services" className="text-slate-600 hover:text-slate-900 text-sm font-medium">Services</Link>
+                <Link href="#about" className="text-slate-600 hover:text-slate-900 text-sm font-medium">About</Link>
+                <Link href="#contact" className="text-slate-600 hover:text-slate-900 text-sm font-medium">Contact</Link>
+              </div>
             </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="#services" className="text-slate-600 hover:text-slate-900">Services</Link>
-              <Link href="#about" className="text-slate-600 hover:text-slate-900">About</Link>
-              <Link href="#contact" className="text-slate-600 hover:text-slate-900">Contact</Link>
-            </div>
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-3">
               <Link href="/login">
-                <Button variant="ghost">Sign In</Button>
+                <Button variant="ghost" size="sm">Sign In</Button>
               </Link>
               <Link href="/register">
-                <Button>Get Started</Button>
+                <Button size="sm">Get Started</Button>
               </Link>
             </div>
             <MobileNav />
