@@ -57,8 +57,8 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <Link href="/" className="flex items-center justify-center space-x-2 mb-4">
-            <Image src="/logo.png" alt="EPM Logo" width={40} height={40} />
-            <span className="text-xl font-bold">Elevate PM</span>
+            <Image src="/logo.png" alt="EPM Logo" width={48} height={48} />
+            <span className="text-xl font-bold">Elevate Property Management</span>
           </Link>
           <CardTitle className="text-2xl">Welcome Back</CardTitle>
           <CardDescription>Sign in to your account</CardDescription>

@@ -11,8 +11,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <Image src="/logo.png" alt="EPM Logo" width={40} height={40} />
-              <span className="text-xl font-bold text-slate-900">Elevate PM</span>
+              <Image src="/logo.png" alt="EPM Logo" width={48} height={48} />
+              <span className="text-xl font-bold text-slate-900">Elevate Property Management</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <Link href="#services" className="text-slate-600 hover:text-slate-900">Services</Link>
@@ -181,8 +181,8 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <Image src="/logo.png" alt="EPM Logo" width={32} height={32} className="brightness-0 invert" />
-                <span className="text-lg font-bold">Elevate PM</span>
+                <Image src="/logo.png" alt="EPM Logo" width={40} height={40} className="brightness-0 invert" />
+                <span className="text-lg font-bold">Elevate Property Management</span>
               </div>
               <p className="text-slate-400">
                 Professional property management services.

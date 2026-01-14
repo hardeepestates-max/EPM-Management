@@ -65,9 +65,9 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex flex-col h-full bg-slate-900 text-white">
       {/* Logo */}
       <div className="flex items-center space-x-2 px-6 py-4 border-b border-slate-700">
-        <Image src="/logo.png" alt="EPM Logo" width={32} height={32} className="brightness-0 invert" />
+        <Image src="/logo.png" alt="EPM Logo" width={40} height={40} className="brightness-0 invert flex-shrink-0" />
         <div>
-          <span className="text-lg font-bold">Elevate PM</span>
+          <span className="text-sm font-bold leading-tight">Elevate Property Management</span>
           <p className="text-xs text-slate-400">{roleLabel}</p>
         </div>
       </div>
@@ -136,9 +136,9 @@ export function MobileNav() {
   return (
     <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-slate-900 text-white">
       <div className="flex items-center space-x-2">
-        <Image src="/logo.png" alt="EPM Logo" width={28} height={28} className="brightness-0 invert" />
+        <Image src="/logo.png" alt="EPM Logo" width={36} height={36} className="brightness-0 invert flex-shrink-0" />
         <div>
-          <span className="text-base font-bold">Elevate PM</span>
+          <span className="text-sm font-bold leading-tight">Elevate Property Management</span>
           <p className="text-xs text-slate-400">{roleLabel}</p>
         </div>
       </div>
