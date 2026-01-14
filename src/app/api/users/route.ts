@@ -10,6 +10,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // SECURITY: Only ADMIN can list all users
+    if (session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
     const { searchParams } = new URL(req.url)
     const role = searchParams.get("role")
 

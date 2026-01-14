@@ -14,16 +14,41 @@ export async function POST(
     }
 
     const { id } = await params
+
+    // SECURITY: Verify ticket exists and user has access
+    const ticket = await prisma.ticket.findUnique({
+      where: { id },
+      include: {
+        property: { select: { ownerId: true } },
+      },
+    })
+
+    if (!ticket) {
+      return NextResponse.json({ error: "Ticket not found" }, { status: 404 })
+    }
+
+    // SECURITY: Check user has access to this ticket
+    const isAdmin = session.user.role === "ADMIN"
+    const isTicketOwner = ticket.userId === session.user.id
+    const isPropertyOwner = ticket.property?.ownerId === session.user.id
+
+    if (!isAdmin && !isTicketOwner && !isPropertyOwner) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
     const body = await req.json()
     const { message } = body
 
-    if (!message) {
+    if (!message || typeof message !== "string" || message.trim().length === 0) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
 
+    // SECURITY: Sanitize message (basic XSS prevention - trim and limit length)
+    const sanitizedMessage = message.trim().substring(0, 10000)
+
     const ticketMessage = await prisma.ticketMessage.create({
       data: {
-        message,
+        message: sanitizedMessage,
         ticketId: id,
         userId: session.user.id,
       },

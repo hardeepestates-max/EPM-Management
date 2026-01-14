@@ -128,7 +128,7 @@ export default async function TenantUnitPage() {
             </div>
             <div className="bg-slate-50 rounded-lg p-4">
               <p className="text-sm text-slate-500">Security Deposit</p>
-              <p className="font-semibold">${lease.deposit.toLocaleString()}</p>
+              <p className="font-semibold">${(lease.deposit ?? 0).toLocaleString()}</p>
             </div>
           </div>
         </div>

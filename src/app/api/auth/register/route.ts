@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma"
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password, role } = await req.json()
+    const { name, email, password } = await req.json()
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -13,8 +13,25 @@ export async function POST(req: Request) {
       )
     }
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: "Invalid email format" },
+        { status: 400 }
+      )
+    }
+
+    // Validate password strength (min 8 chars, 1 uppercase, 1 lowercase, 1 number)
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: "Password must be at least 8 characters" },
+        { status: 400 }
+      )
+    }
+
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { email: email.toLowerCase().trim() }
     })
 
     if (existingUser) {
@@ -26,12 +43,14 @@ export async function POST(req: Request) {
 
     const hashedPassword = await hash(password, 12)
 
+    // SECURITY: Only allow TENANT role for public registration
+    // Admin must create OWNER/ADMIN users through admin panel
     const user = await prisma.user.create({
       data: {
-        name,
-        email,
+        name: name.trim(),
+        email: email.toLowerCase().trim(),
         password: hashedPassword,
-        role: role || "TENANT",
+        role: "TENANT",
       }
     })
 
