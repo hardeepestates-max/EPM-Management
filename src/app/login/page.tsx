@@ -4,11 +4,11 @@ import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2 } from "lucide-react"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -57,7 +57,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <Link href="/" className="flex items-center justify-center space-x-2 mb-4">
-            <Building2 className="h-8 w-8 text-blue-600" />
+            <Image src="/logo.png" alt="EPM Logo" width={40} height={40} />
             <span className="text-xl font-bold">Elevate PM</span>
           </Link>
           <CardTitle className="text-2xl">Welcome Back</CardTitle>

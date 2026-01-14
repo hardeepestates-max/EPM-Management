@@ -1,23 +1,25 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
-  Building2,
   LayoutDashboard,
   Building,
   Users,
   Ticket,
   FileText,
   CreditCard,
-  Settings,
   LogOut,
   Home,
   Wrench,
+  Menu,
 } from "lucide-react"
+import { useState } from "react"
 
 interface NavItem {
   title: string
@@ -51,7 +53,7 @@ const tenantNavItems: NavItem[] = [
   { title: "Documents", href: "/dashboard/tenant/documents", icon: FileText },
 ]
 
-export function Sidebar() {
+function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
   const { data: session } = useSession()
   const role = session?.user?.role || "TENANT"
@@ -60,10 +62,10 @@ export function Sidebar() {
   const roleLabel = role === "ADMIN" ? "Administrator" : role === "OWNER" ? "Property Owner" : "Tenant"
 
   return (
-    <div className="flex flex-col h-full w-64 bg-slate-900 text-white">
+    <div className="flex flex-col h-full bg-slate-900 text-white">
       {/* Logo */}
       <div className="flex items-center space-x-2 px-6 py-4 border-b border-slate-700">
-        <Building2 className="h-8 w-8 text-blue-400" />
+        <Image src="/logo.png" alt="EPM Logo" width={32} height={32} className="brightness-0 invert" />
         <div>
           <span className="text-lg font-bold">Elevate PM</span>
           <p className="text-xs text-slate-400">{roleLabel}</p>
@@ -78,6 +80,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavigate}
               className={cn(
                 "flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors",
                 isActive
@@ -112,6 +115,43 @@ export function Sidebar() {
           Sign Out
         </Button>
       </div>
+    </div>
+  )
+}
+
+export function Sidebar() {
+  return (
+    <div className="hidden lg:block w-64 flex-shrink-0">
+      <SidebarContent />
+    </div>
+  )
+}
+
+export function MobileNav() {
+  const [open, setOpen] = useState(false)
+  const { data: session } = useSession()
+  const role = session?.user?.role || "TENANT"
+  const roleLabel = role === "ADMIN" ? "Administrator" : role === "OWNER" ? "Property Owner" : "Tenant"
+
+  return (
+    <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-slate-900 text-white">
+      <div className="flex items-center space-x-2">
+        <Image src="/logo.png" alt="EPM Logo" width={28} height={28} className="brightness-0 invert" />
+        <div>
+          <span className="text-base font-bold">Elevate PM</span>
+          <p className="text-xs text-slate-400">{roleLabel}</p>
+        </div>
+      </div>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="text-white hover:bg-slate-800">
+            <Menu className="h-6 w-6" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0 w-64 border-0">
+          <SidebarContent onNavigate={() => setOpen(false)} />
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

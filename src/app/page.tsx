@@ -1,6 +1,7 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Building2, Users, Wrench, FileText, Shield, Phone } from "lucide-react"
+import { Users, Wrench, FileText, Shield, Phone } from "lucide-react"
 
 export default function HomePage() {
   return (
@@ -10,7 +11,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <Building2 className="h-8 w-8 text-blue-600" />
+              <Image src="/logo.png" alt="EPM Logo" width={40} height={40} />
               <span className="text-xl font-bold text-slate-900">Elevate PM</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -180,7 +181,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <Building2 className="h-6 w-6" />
+                <Image src="/logo.png" alt="EPM Logo" width={32} height={32} className="brightness-0 invert" />
                 <span className="text-lg font-bold">Elevate PM</span>
               </div>
               <p className="text-slate-400">
