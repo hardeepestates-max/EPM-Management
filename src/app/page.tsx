@@ -200,7 +200,7 @@ export default function HomePage() {
               <ul className="space-y-2 text-slate-400">
                 <li className="flex items-center space-x-2">
                   <Phone className="h-4 w-4" />
-                  <span>(201) 917-0689</span>
+                  <span>(201) 887-7766</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Mail className="h-4 w-4" />
