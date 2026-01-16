@@ -46,7 +46,7 @@ export default function HomePage() {
             <span className="text-blue-600"> Elevated</span>
           </h1>
           <p className="text-xl text-slate-600 mb-6 max-w-2xl mx-auto">
-            Professional property management services that put owners and tenants first.
+            Professional property management services in Cliffside Park, Bergen County & Northern New Jersey.
             Over a decade of real estate expertise at your service.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -100,16 +100,16 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold text-slate-900 mb-6">
-                A Decade of Real Estate Excellence
+                North Jersey&apos;s Trusted Property Managers
               </h2>
               <p className="text-slate-600 mb-4">
-                With over 10 years of experience in real estate, Elevate Property Management
-                brings expertise and dedication to every property we manage.
+                Based in Cliffside Park, NJ, Elevate Property Management has served Bergen County
+                and Northern New Jersey property owners for over 10 years with dedication and expertise.
               </p>
               <p className="text-slate-600 mb-6">
-                We understand the challenges of property ownership and tenant relations.
+                We understand the unique challenges of the North Jersey rental market.
                 Our platform streamlines communication, payments, and maintenance to make
-                property management effortless.
+                property management effortless for owners throughout Bergen, Hudson, and Passaic counties.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
