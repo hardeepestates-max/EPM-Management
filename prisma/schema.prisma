@@ -44,11 +44,12 @@ model Property {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  ownerId   String
-  owner     User       @relation("PropertyOwner", fields: [ownerId], references: [id])
-  units     Unit[]
-  tickets   Ticket[]
-  documents Document[]
+  ownerId       String
+  owner         User           @relation("PropertyOwner", fields: [ownerId], references: [id])
+  units         Unit[]
+  tickets       Ticket[]
+  documents     Document[]
+  tenantInvites TenantInvite[]
 
   @@map("properties")
 }
@@ -65,10 +66,11 @@ model Unit {
   updatedAt  DateTime @updatedAt
 
   // Relations
-  propertyId String
-  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  leases     Lease[]
-  tickets    Ticket[]
+  propertyId    String
+  property      Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  leases        Lease[]
+  tickets       Ticket[]
+  tenantInvites TenantInvite[]
 
   @@map("units")
 }
@@ -220,4 +222,22 @@ model InvoiceLineItem {
   invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
   @@map("invoice_line_items")
+}
+
+model TenantInvite {
+  id        String    @id @default(cuid())
+  token     String    @unique @default(cuid())
+  email     String
+  status    String    @default("PENDING") // PENDING, ACCEPTED, EXPIRED
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  // Relations
+  unitId     String
+  unit       Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("tenant_invites")
 }

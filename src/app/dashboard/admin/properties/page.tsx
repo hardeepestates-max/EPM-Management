@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Building, MapPin, Pencil, Trash2, X } from "lucide-react"
+import { Plus, Building, MapPin, Pencil, Trash2, X, Home } from "lucide-react"
 
 interface Owner {
   id: string
@@ -268,7 +268,9 @@ export default function PropertiesPage() {
             <Card key={property.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">{property.name}</CardTitle>
+                  <Link href={`/dashboard/admin/properties/${property.id}`} className="hover:text-blue-600">
+                    <CardTitle className="text-lg">{property.name}</CardTitle>
+                  </Link>
                   <Badge
                     variant={property.status === "ACTIVE" ? "default" : "secondary"}
                   >
@@ -289,7 +291,13 @@ export default function PropertiesPage() {
                   </span>
                   <span className="text-slate-500">Owner: {property.owner?.name || "Unassigned"}</span>
                 </div>
-                <div className="mt-4 flex space-x-2">
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link href={`/dashboard/admin/properties/${property.id}`}>
+                    <Button variant="outline" size="sm">
+                      <Home className="h-4 w-4 mr-1" />
+                      Units
+                    </Button>
+                  </Link>
                   <Button
                     variant="outline"
                     size="sm"
