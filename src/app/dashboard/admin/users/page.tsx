@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Users, Mail, Shield, Home, Plus, X, Trash2 } from "lucide-react"
+import { Users, Mail, Shield, Home, Plus, X, Trash2, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -23,13 +23,21 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
   const [creating, setCreating] = useState(false)
+  const [updating, setUpdating] = useState(false)
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
     password: "",
     role: "OWNER"
   })
+  const [editUser, setEditUser] = useState<{
+    id: string
+    name: string
+    email: string
+    role: string
+  } | null>(null)
 
   useEffect(() => {
     fetchUsers()
@@ -69,6 +77,46 @@ export default function AdminUsersPage() {
       alert("Failed to create user")
     } finally {
       setCreating(false)
+    }
+  }
+
+  const openEditModal = (user: User) => {
+    setEditUser({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    })
+    setShowEditModal(true)
+  }
+
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editUser) return
+    setUpdating(true)
+    try {
+      const res = await fetch(`/api/users/${editUser.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editUser.name,
+          email: editUser.email,
+          role: editUser.role
+        })
+      })
+      if (res.ok) {
+        setShowEditModal(false)
+        setEditUser(null)
+        fetchUsers()
+      } else {
+        const data = await res.json()
+        alert(data.error || "Failed to update user")
+      }
+    } catch (error) {
+      console.error("Error updating user:", error)
+      alert("Failed to update user")
+    } finally {
+      setUpdating(false)
     }
   }
 
@@ -194,6 +242,67 @@ export default function AdminUsersPage() {
         </div>
       )}
 
+      {/* Edit User Modal */}
+      {showEditModal && editUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Edit User</h2>
+              <button onClick={() => { setShowEditModal(false); setEditUser(null); }} className="text-slate-400 hover:text-slate-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleUpdateUser} className="space-y-4">
+              <div>
+                <Label htmlFor="edit-name">Full Name</Label>
+                <Input
+                  id="edit-name"
+                  value={editUser.name}
+                  onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
+                  placeholder="John Smith"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-email">Email</Label>
+                <Input
+                  id="edit-email"
+                  type="email"
+                  value={editUser.email}
+                  onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+                  placeholder="john@example.com"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-role">Role</Label>
+                <Select
+                  value={editUser.role}
+                  onValueChange={(value) => setEditUser({ ...editUser, role: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="OWNER">Owner</SelectItem>
+                    <SelectItem value="TENANT">Tenant</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex space-x-3 pt-2">
+                <Button type="submit" disabled={updating} className="flex-1">
+                  {updating ? "Saving..." : "Save Changes"}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => { setShowEditModal(false); setEditUser(null); }}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {users.length === 0 ? (
         <div className="bg-white rounded-xl border p-12 text-center">
           <Users className="h-12 w-12 text-slate-300 mx-auto mb-4" />
@@ -256,14 +365,24 @@ export default function AdminUsersPage() {
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="p-4">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => handleDeleteUser(user.id, user.name)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                        onClick={() => openEditModal(user)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => handleDeleteUser(user.id, user.name)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
