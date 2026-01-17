@@ -50,9 +50,9 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-8">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <Link href="/" className="flex items-center justify-center space-x-2 mb-4">
+          <Link href="/" className="flex flex-col sm:flex-row items-center justify-center sm:space-x-2 mb-4">
             <Image src="/logo.png" alt="EPM Logo" width={48} height={48} />
-            <span className="text-xl font-bold">Elevate Property Management</span>
+            <span className="text-xl font-bold text-center mt-2 sm:mt-0">Elevate Property Management</span>
           </Link>
           <CardTitle className="text-2xl">Create Account</CardTitle>
           <CardDescription>Get started with Elevate Property Management</CardDescription>
