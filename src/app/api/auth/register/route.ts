@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server"
 import { hash } from "bcryptjs"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json()
+    const { name, email, password, role } = await req.json()
+    const session = await getServerSession(authOptions)
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -43,14 +46,17 @@ export async function POST(req: Request) {
 
     const hashedPassword = await hash(password, 12)
 
-    // SECURITY: Only allow TENANT role for public registration
-    // Admin must create OWNER/ADMIN users through admin panel
+    // If admin is creating user, allow any role; otherwise default to TENANT
+    const isAdmin = session?.user?.role === "ADMIN"
+    const validRoles = ["ADMIN", "OWNER", "TENANT"]
+    const userRole = isAdmin && role && validRoles.includes(role) ? role : "TENANT"
+
     const user = await prisma.user.create({
       data: {
         name: name.trim(),
         email: email.toLowerCase().trim(),
         password: hashedPassword,
-        role: "TENANT",
+        role: userRole,
       }
     })
 
