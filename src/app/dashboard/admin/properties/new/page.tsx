@@ -131,21 +131,35 @@ export default function NewPropertyPage() {
 
             <div className="space-y-2">
               <Label htmlFor="owner">Property Owner</Label>
-              <Select
-                value={formData.ownerId}
-                onValueChange={(value) => setFormData({ ...formData, ownerId: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select an owner" />
-                </SelectTrigger>
-                <SelectContent>
-                  {owners.map((owner) => (
-                    <SelectItem key={owner.id} value={owner.id}>
-                      {owner.name} ({owner.email})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {owners.length === 0 ? (
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-800 mb-2">
+                    No owners found. You need to create an owner first.
+                  </p>
+                  <Link href="/dashboard/admin/users">
+                    <Button type="button" size="sm" variant="outline">
+                      Go to Users → Add Owner
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <Select
+                  value={formData.ownerId}
+                  onValueChange={(value) => setFormData({ ...formData, ownerId: value })}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an owner" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {owners.map((owner) => (
+                      <SelectItem key={owner.id} value={owner.id}>
+                        {owner.name} ({owner.email})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             <div className="space-y-2">
