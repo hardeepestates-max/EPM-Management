@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Users, Mail, Shield, Home, Plus, X } from "lucide-react"
+import { Users, Mail, Shield, Home, Plus, X, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -69,6 +69,26 @@ export default function AdminUsersPage() {
       alert("Failed to create user")
     } finally {
       setCreating(false)
+    }
+  }
+
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    if (!confirm(`Are you sure you want to delete ${userName}? This cannot be undone.`)) {
+      return
+    }
+    try {
+      const res = await fetch(`/api/users/${userId}`, {
+        method: "DELETE"
+      })
+      if (res.ok) {
+        fetchUsers()
+      } else {
+        const data = await res.json()
+        alert(data.error || "Failed to delete user")
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error)
+      alert("Failed to delete user")
     }
   }
 
@@ -193,6 +213,7 @@ export default function AdminUsersPage() {
                 <th className="text-left p-4 font-medium text-slate-600">Role</th>
                 <th className="text-left p-4 font-medium text-slate-600">Properties/Leases</th>
                 <th className="text-left p-4 font-medium text-slate-600">Joined</th>
+                <th className="text-left p-4 font-medium text-slate-600">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -233,6 +254,16 @@ export default function AdminUsersPage() {
                   </td>
                   <td className="p-4 text-slate-600">
                     {new Date(user.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="p-4">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => handleDeleteUser(user.id, user.name)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </td>
                 </tr>
               ))}
