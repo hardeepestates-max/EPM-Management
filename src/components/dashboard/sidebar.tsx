@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   Building,
   Users,
+  UserCheck,
   Ticket,
   FileText,
   CreditCard,
@@ -32,6 +33,7 @@ interface NavItem {
 const adminNavItems: NavItem[] = [
   { title: "Dashboard", href: "/dashboard/admin", icon: LayoutDashboard },
   { title: "Properties", href: "/dashboard/admin/properties", icon: Building },
+  { title: "Tenants", href: "/dashboard/admin/tenants", icon: UserCheck },
   { title: "Users", href: "/dashboard/admin/users", icon: Users },
   { title: "Tickets", href: "/dashboard/admin/tickets", icon: Ticket },
   { title: "Payments", href: "/dashboard/admin/payments", icon: CreditCard },
