@@ -106,7 +106,7 @@ export default function TenantsPage() {
 
   const handlePropertyChange = async (propertyId: string) => {
     setInviteForm({ ...inviteForm, propertyId, unitId: "" })
-    setGeneratedLink("")
+    setGeneratedLinks([])
 
     if (propertyId) {
       try {
