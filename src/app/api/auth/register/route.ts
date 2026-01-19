@@ -33,8 +33,14 @@ export async function POST(req: Request) {
       )
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email: email.toLowerCase().trim() }
+    // Case-insensitive check for existing user
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        email: {
+          equals: email.trim(),
+          mode: 'insensitive'
+        }
+      }
     })
 
     if (existingUser) {

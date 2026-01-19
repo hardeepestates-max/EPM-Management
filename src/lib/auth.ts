@@ -1,10 +1,15 @@
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import GoogleProvider from "next-auth/providers/google"
 import { compare } from "bcryptjs"
 import prisma from "./prisma"
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    }),
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -16,8 +21,14 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials")
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
+        // Case-insensitive email lookup
+        const user = await prisma.user.findFirst({
+          where: {
+            email: {
+              equals: credentials.email,
+              mode: 'insensitive'
+            }
+          }
         })
 
         if (!user || !user.password) {
@@ -40,10 +51,59 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      // Handle Google OAuth sign in
+      if (account?.provider === "google") {
+        const email = user.email?.toLowerCase()
+        if (!email) return false
+
+        // Check if user exists
+        let existingUser = await prisma.user.findFirst({
+          where: {
+            email: {
+              equals: email,
+              mode: 'insensitive'
+            }
+          }
+        })
+
+        if (!existingUser) {
+          // Create new user as TENANT by default for Google sign-in
+          existingUser = await prisma.user.create({
+            data: {
+              email: email,
+              name: user.name || "User",
+              password: "", // No password for OAuth users
+              role: "TENANT"
+            }
+          })
+        }
+
+        // Attach the database user id to the user object
+        user.id = existingUser.id
+        user.role = existingUser.role
+      }
+      return true
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id
         token.role = user.role
+      }
+      // For OAuth, fetch role from database
+      if (account?.provider === "google" && token.email) {
+        const dbUser = await prisma.user.findFirst({
+          where: {
+            email: {
+              equals: token.email as string,
+              mode: 'insensitive'
+            }
+          }
+        })
+        if (dbUser) {
+          token.id = dbUser.id
+          token.role = dbUser.role
+        }
       }
       return token
     },
