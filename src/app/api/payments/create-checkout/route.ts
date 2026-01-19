@@ -91,16 +91,14 @@ export async function POST(request: Request) {
       },
     ]
 
-    // Add convenience fee as separate line item if applicable
-    if (convenienceFee > 0) {
+    // Add convenience fee as separate line item if applicable (cards only, ACH is free)
+    if (convenienceFee > 0 && paymentMethod === "card") {
       lineItems.push({
         price_data: {
           currency: "usd",
           product_data: {
-            name: paymentMethod === "card" ? "Card Processing Fee" : "ACH Processing Fee",
-            description: paymentMethod === "card"
-              ? `2.9% convenience fee for card payment`
-              : `ACH bank transfer fee`,
+            name: "Card Processing Fee",
+            description: `2.9% convenience fee for card payment`,
           },
           unit_amount: Math.round(convenienceFee * 100),
         },

@@ -21,6 +21,7 @@ import {
   Menu,
   Receipt,
   DollarSign,
+  Wallet,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -57,6 +58,7 @@ const tenantNavItems: NavItem[] = [
   { title: "My Unit", href: "/dashboard/tenant/unit", icon: Home },
   { title: "Maintenance", href: "/dashboard/tenant/tickets", icon: Wrench },
   { title: "Payments", href: "/dashboard/tenant/payments", icon: CreditCard },
+  { title: "Payment Methods", href: "/dashboard/tenant/payment-methods", icon: Wallet },
   { title: "Documents", href: "/dashboard/tenant/documents", icon: FileText },
 ]
 

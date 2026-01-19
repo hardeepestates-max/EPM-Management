@@ -33,7 +33,7 @@ interface Payment {
 }
 
 const CARD_FEE_PERCENT = 2.9
-const ACH_FEE = 1.50
+const ACH_FEE = 0 // Free ACH
 
 export default function TenantPaymentsPage() {
   const { data: session } = useSession()
@@ -248,12 +248,17 @@ export default function TenantPaymentsPage() {
                 </div>
                 {paymentMethod && (
                   <>
-                    <div className="flex justify-between mb-2 text-sm">
-                      <span className="text-slate-500">
-                        {paymentMethod === "card" ? "Card Processing Fee (2.9%)" : "ACH Processing Fee"}
-                      </span>
-                      <span>${calculateFee(selectedPayment.amount, paymentMethod).toFixed(2)}</span>
-                    </div>
+                    {paymentMethod === "card" ? (
+                      <div className="flex justify-between mb-2 text-sm">
+                        <span className="text-slate-500">Card Processing Fee (2.9%)</span>
+                        <span>${calculateFee(selectedPayment.amount, paymentMethod).toFixed(2)}</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between mb-2 text-sm">
+                        <span className="text-green-600">No processing fee</span>
+                        <span className="text-green-600">$0.00</span>
+                      </div>
+                    )}
                     <div className="border-t pt-2 flex justify-between font-semibold">
                       <span>Total</span>
                       <span>
@@ -275,7 +280,7 @@ export default function TenantPaymentsPage() {
                   <Landmark className="h-6 w-6 text-slate-600" />
                   <div className="flex-1 text-left">
                     <p className="font-medium">Bank Transfer (ACH)</p>
-                    <p className="text-sm text-slate-500">$1.50 fee - Recommended</p>
+                    <p className="text-sm text-green-600 font-medium">Free - No fee</p>
                   </div>
                   {paymentMethod === "ach" && (
                     <CheckCircle className="h-5 w-5 text-blue-600" />
