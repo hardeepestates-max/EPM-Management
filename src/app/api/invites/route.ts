@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+import { sendTenantInviteEmail } from "@/lib/email"
 
 export async function GET(req: NextRequest) {
   try {
@@ -87,7 +88,25 @@ export async function POST(req: NextRequest) {
       }
     })
 
-    return NextResponse.json({ invite })
+    // Send invite email
+    const baseUrl = process.env.NEXTAUTH_URL || 'https://elevateproperty.management'
+    const inviteLink = `${baseUrl}/register/invite/${invite.token}`
+
+    try {
+      await sendTenantInviteEmail({
+        to: invite.email,
+        propertyName: invite.property.name,
+        propertyAddress: `${invite.property.address}, ${invite.property.city}, ${invite.property.state} ${invite.property.zipCode}`,
+        unitNumber: invite.unit.unitNumber,
+        rentAmount: invite.unit.rentAmount,
+        inviteLink
+      })
+    } catch (emailError) {
+      console.error("Error sending invite email:", emailError)
+      // Don't fail the request if email fails - invite is still created
+    }
+
+    return NextResponse.json({ invite, emailSent: true })
   } catch (error) {
     console.error("Error creating invite:", error)
     return NextResponse.json({ error: "Failed to create invite" }, { status: 500 })
