@@ -50,9 +50,16 @@ const jsonLd = {
   "email": "elevatepropertymanagement@outlook.com",
   "address": {
     "@type": "PostalAddress",
+    "streetAddress": "605 Anderson Ave #3",
     "addressLocality": "Cliffside Park",
     "addressRegion": "NJ",
+    "postalCode": "07010",
     "addressCountry": "US"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "40.8212",
+    "longitude": "-73.9876"
   },
   "areaServed": [
     { "@type": "City", "name": "Cliffside Park" },
@@ -62,7 +69,14 @@ const jsonLd = {
     { "@type": "State", "name": "New Jersey" }
   ],
   "serviceType": ["Property Management", "Tenant Screening", "Rent Collection", "Maintenance Services"],
-  "openingHours": "Mo-Su 09:00-18:00",
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      "opens": "09:00",
+      "closes": "17:00"
+    }
+  ],
   "priceRange": "$$"
 };
 

@@ -1,7 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Users, Wrench, FileText, Shield, Phone, Mail } from "lucide-react"
+import { Users, Wrench, FileText, Shield, Phone, Mail, MapPin } from "lucide-react"
 import { MobileNav } from "@/components/mobile-nav"
 
 export default function HomePage() {
@@ -197,14 +197,18 @@ export default function HomePage() {
             </div>
             <div>
               <h4 className="font-semibold mb-4">Contact</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li className="flex items-center space-x-2">
-                  <Phone className="h-4 w-4" />
-                  <span>(201) 887-7766</span>
+              <ul className="space-y-3 text-slate-400">
+                <li className="flex items-start space-x-2">
+                  <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <span>605 Anderson Ave #3<br />Cliffside Park, NJ 07010</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4" />
-                  <a href="mailto:elevatepropertymanagement@outlook.com" className="hover:text-white">
+                  <Phone className="h-4 w-4 flex-shrink-0" />
+                  <a href="tel:+12018877766" className="hover:text-white">(201) 887-7766</a>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Mail className="h-4 w-4 flex-shrink-0" />
+                  <a href="mailto:elevatepropertymanagement@outlook.com" className="hover:text-white break-all">
                     elevatepropertymanagement@outlook.com
                   </a>
                 </li>
@@ -212,9 +216,10 @@ export default function HomePage() {
             </div>
             <div>
               <h4 className="font-semibold mb-4">Hours</h4>
-              <p className="text-slate-400">
-                Everyday: 9am - 6pm
-              </p>
+              <div className="text-slate-400 space-y-1">
+                <p>Mon - Sat: 9am - 5pm</p>
+                <p>Sunday: Closed</p>
+              </div>
             </div>
           </div>
           <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
