@@ -57,7 +57,11 @@ export default async function OwnerDashboard() {
     redirect("/login")
   }
 
-  if (session.user.role !== "OWNER" && session.user.role !== "ADMIN") {
+  if (session.user.role === "ADMIN") {
+    redirect("/dashboard/admin")
+  }
+
+  if (session.user.role !== "OWNER") {
     redirect("/dashboard/tenant")
   }
 

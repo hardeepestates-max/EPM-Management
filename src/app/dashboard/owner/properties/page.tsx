@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth"
+import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { Building, MapPin, Home } from "lucide-react"
@@ -7,6 +8,18 @@ import { Button } from "@/components/ui/button"
 
 export default async function OwnerPropertiesPage() {
   const session = await getServerSession(authOptions)
+
+  if (!session) {
+    redirect("/login")
+  }
+
+  if (session.user.role === "ADMIN") {
+    redirect("/dashboard/admin/properties")
+  }
+
+  if (session.user.role !== "OWNER") {
+    redirect("/dashboard/tenant")
+  }
 
   const properties = await prisma.property.findMany({
     where: { ownerId: session?.user?.id },
