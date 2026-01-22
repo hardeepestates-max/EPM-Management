@@ -26,6 +26,7 @@ model User {
   documents        Document[]
   billingSettings  OwnerBillingSettings?
   invoices         Invoice[]
+  bulkEmails       BulkEmail[]
 
   @@map("users")
 }
@@ -339,4 +340,23 @@ model Expense {
   property   Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@map("expenses")
+}
+
+// ============================================
+// COMMUNICATIONS
+// ============================================
+
+model BulkEmail {
+  id             String   @id @default(cuid())
+  subject        String
+  body           String   @db.Text
+  recipientType  String   // "OWNER", "TENANT", "ALL"
+  recipientCount Int
+  sentAt         DateTime @default(now())
+
+  // Relations
+  sentById String
+  sentBy   User   @relation(fields: [sentById], references: [id])
+
+  @@map("bulk_emails")
 }

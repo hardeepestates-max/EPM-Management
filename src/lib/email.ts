@@ -105,3 +105,60 @@ export async function sendTenantInviteEmail({
 
   return data
 }
+
+interface BulkEmailProps {
+  to: string
+  recipientName?: string
+  subject: string
+  body: string
+}
+
+export async function sendBulkEmail({
+  to,
+  recipientName,
+  subject,
+  body
+}: BulkEmailProps) {
+  const greeting = recipientName ? `Hi ${recipientName},` : 'Hi,'
+
+  const { data, error } = await getResend().emails.send({
+    from: 'Elevate Property Management <noreply@elevateproperty.management>',
+    to: [to],
+    subject: subject,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #334155; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #0f172a; margin: 0; font-size: 24px;">Elevate Property Management</h1>
+          </div>
+
+          <div style="background: #f8fafc; border-radius: 12px; padding: 30px; margin-bottom: 20px;">
+            <p style="margin: 0 0 20px 0; font-size: 16px;">${greeting}</p>
+
+            <div style="font-size: 16px; white-space: pre-wrap;">${body}</div>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
+
+          <p style="color: #94a3b8; font-size: 12px; margin: 0; text-align: center;">
+            Elevate Property Management<br>
+            North Jersey Property Management Services<br>
+            <a href="https://elevateproperty.management" style="color: #2563eb;">elevateproperty.management</a>
+          </p>
+        </body>
+      </html>
+    `,
+  })
+
+  if (error) {
+    console.error('Error sending bulk email:', error)
+    throw error
+  }
+
+  return data
+}

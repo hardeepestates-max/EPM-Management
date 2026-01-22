@@ -24,6 +24,7 @@ import {
   Wallet,
   ClipboardList,
   BarChart3,
+  Mail,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -43,6 +44,7 @@ const adminNavItems: NavItem[] = [
   { title: "Payments", href: "/dashboard/admin/payments", icon: CreditCard },
   { title: "Billing", href: "/dashboard/admin/billing", icon: DollarSign },
   { title: "Invoices", href: "/dashboard/admin/invoices", icon: Receipt },
+  { title: "Communications", href: "/dashboard/admin/communications", icon: Mail },
   { title: "Reports", href: "/dashboard/admin/reports", icon: BarChart3 },
   { title: "Documents", href: "/dashboard/admin/documents", icon: FileText },
 ]
