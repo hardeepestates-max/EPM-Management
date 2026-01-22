@@ -1,6 +1,18 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy initialization to prevent build errors when API key is not set
+let resend: Resend | null = null
+
+function getResend() {
+  if (!resend) {
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY environment variable is not set')
+    }
+    resend = new Resend(apiKey)
+  }
+  return resend
+}
 
 interface TenantInviteEmailProps {
   to: string
@@ -23,7 +35,7 @@ export async function sendTenantInviteEmail({
 }: TenantInviteEmailProps) {
   const greeting = tenantName ? `Hi ${tenantName},` : 'Hi,'
 
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResend().emails.send({
     from: 'Elevate Property Management <onboarding@resend.dev>',
     to: [to],
     subject: `You're Invited to Join Elevate Property Management`,

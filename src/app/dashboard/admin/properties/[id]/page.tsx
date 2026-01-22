@@ -8,7 +8,9 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Plus, Building, Home, Pencil, Trash2, X, Mail, Copy, Check, UserPlus } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ArrowLeft, Plus, Building, Home, Pencil, Trash2, X, Mail, Copy, Check, UserPlus, FileText, Calendar } from "lucide-react"
+import { FinancialSummaryCards, RentRollTable, LeaseExpirationTimeline, QuickActions } from "@/components/property-detail"
 
 interface Unit {
   id: string
@@ -46,10 +48,14 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   const [property, setProperty] = useState<Property | null>(null)
   const [units, setUnits] = useState<Unit[]>([])
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState("overview")
   const [showAddUnitModal, setShowAddUnitModal] = useState(false)
   const [showEditUnitModal, setShowEditUnitModal] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null)
+  const [selectedLeaseId, setSelectedLeaseId] = useState<string | null>(null)
+  const [selectedTenantName, setSelectedTenantName] = useState<string>("")
   const [saving, setSaving] = useState(false)
   const [copied, setCopied] = useState(false)
   const [inviteLink, setInviteLink] = useState("")
@@ -168,11 +174,30 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
     }
   }
 
-  const openInviteModal = (unit: Unit) => {
-    setSelectedUnit(unit)
+  const openInviteModal = (unit?: Unit) => {
+    if (unit) {
+      setSelectedUnit(unit)
+    } else {
+      // Find first available unit without a tenant or invite
+      const availableUnit = units.find(u =>
+        u.status === "AVAILABLE" && u.leases.length === 0 && u.tenantInvites.length === 0
+      )
+      if (availableUnit) {
+        setSelectedUnit(availableUnit)
+      } else {
+        alert("No available units to invite tenants to")
+        return
+      }
+    }
     setInviteEmail("")
     setInviteLink("")
     setShowInviteModal(true)
+  }
+
+  const openPaymentModal = (leaseId: string, tenantName: string) => {
+    setSelectedLeaseId(leaseId)
+    setSelectedTenantName(tenantName)
+    setShowPaymentModal(true)
   }
 
   const handleSendInvite = async (e: React.FormEvent) => {
@@ -229,7 +254,8 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <div className="p-8">
+    <div className="p-8 max-w-7xl mx-auto">
+      {/* Navigation */}
       <div className="mb-6">
         <Link href="/dashboard/admin/properties" className="flex items-center text-slate-600 hover:text-slate-900 mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -237,8 +263,8 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
         </Link>
       </div>
 
-      {/* Property Header */}
-      <div className="flex justify-between items-start mb-8">
+      {/* Property Header with Quick Actions */}
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
         <div>
           <div className="flex items-center space-x-3">
             <h1 className="text-3xl font-bold text-slate-900">{property.name}</h1>
@@ -253,110 +279,204 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             Owner: {property.owner?.name || "Unassigned"}
           </p>
         </div>
-        <Button onClick={() => setShowAddUnitModal(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Unit
-        </Button>
+        <QuickActions
+          propertyId={id}
+          onAddUnit={() => setShowAddUnitModal(true)}
+          onInviteTenant={() => openInviteModal()}
+          onRecordPayment={() => setShowPaymentModal(true)}
+        />
       </div>
 
-      {/* Units Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Home className="h-5 w-5 mr-2" />
-            Units ({units.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {units.length === 0 ? (
-            <div className="text-center py-8">
-              <Building className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-900 mb-2">No units yet</h3>
-              <p className="text-slate-500 mb-4">Add units to this property to start managing tenants</p>
-              <Button onClick={() => setShowAddUnitModal(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Unit
-              </Button>
+      {/* Financial Summary Cards */}
+      <div className="mb-6">
+        <FinancialSummaryCards propertyId={id} />
+      </div>
+
+      {/* Tabbed Content */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4 lg:w-[400px]">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="rent-roll">Rent Roll</TabsTrigger>
+          <TabsTrigger value="leases">Leases</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+        </TabsList>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-3">
+            {/* Units Summary Card */}
+            <Card className="lg:col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center">
+                  <Home className="h-5 w-5 mr-2" />
+                  Units ({units.length})
+                </CardTitle>
+                <Button size="sm" onClick={() => setShowAddUnitModal(true)}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Unit
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {units.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Building className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-slate-900 mb-2">No units yet</h3>
+                    <p className="text-slate-500 mb-4">Add units to this property to start managing tenants</p>
+                    <Button onClick={() => setShowAddUnitModal(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Unit
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-slate-50 border-b">
+                        <tr>
+                          <th className="text-left p-3 font-medium text-slate-600">Unit #</th>
+                          <th className="text-left p-3 font-medium text-slate-600">Beds/Baths</th>
+                          <th className="text-left p-3 font-medium text-slate-600">Rent</th>
+                          <th className="text-left p-3 font-medium text-slate-600">Status</th>
+                          <th className="text-left p-3 font-medium text-slate-600">Tenant</th>
+                          <th className="text-left p-3 font-medium text-slate-600">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {units.slice(0, 5).map((unit) => (
+                          <tr key={unit.id} className="border-b last:border-0 hover:bg-slate-50">
+                            <td className="p-3 font-medium">{unit.unitNumber}</td>
+                            <td className="p-3">{unit.bedrooms}bd / {unit.bathrooms}ba</td>
+                            <td className="p-3">${unit.rentAmount.toLocaleString()}/mo</td>
+                            <td className="p-3">
+                              <Badge className={getStatusColor(unit.status)}>{unit.status}</Badge>
+                            </td>
+                            <td className="p-3">
+                              {unit.leases.length > 0 ? (
+                                <span className="text-sm">{unit.leases[0].tenant.name}</span>
+                              ) : unit.tenantInvites.length > 0 ? (
+                                <span className="text-sm text-yellow-600">Invite pending</span>
+                              ) : (
+                                <span className="text-slate-400 text-sm">Vacant</span>
+                              )}
+                            </td>
+                            <td className="p-3">
+                              <div className="flex space-x-1">
+                                {unit.status === "AVAILABLE" && unit.leases.length === 0 && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                    onClick={() => openInviteModal(unit)}
+                                  >
+                                    <UserPlus className="h-4 w-4" />
+                                  </Button>
+                                )}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedUnit({ ...unit })
+                                    setShowEditUnitModal(true)
+                                  }}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() => handleDeleteUnit(unit.id, unit.unitNumber)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {units.length > 5 && (
+                      <div className="text-center pt-4">
+                        <Button variant="link" onClick={() => setActiveTab("rent-roll")}>
+                          View all {units.length} units
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Lease Expirations Widget */}
+            <div className="lg:col-span-1">
+              <LeaseExpirationTimeline propertyId={id} compact />
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-50 border-b">
-                  <tr>
-                    <th className="text-left p-4 font-medium text-slate-600">Unit #</th>
-                    <th className="text-left p-4 font-medium text-slate-600">Beds/Baths</th>
-                    <th className="text-left p-4 font-medium text-slate-600">Sq Ft</th>
-                    <th className="text-left p-4 font-medium text-slate-600">Rent</th>
-                    <th className="text-left p-4 font-medium text-slate-600">Status</th>
-                    <th className="text-left p-4 font-medium text-slate-600">Tenant</th>
-                    <th className="text-left p-4 font-medium text-slate-600">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {units.map((unit) => (
-                    <tr key={unit.id} className="border-b last:border-0 hover:bg-slate-50">
-                      <td className="p-4 font-medium">{unit.unitNumber}</td>
-                      <td className="p-4">{unit.bedrooms} bd / {unit.bathrooms} ba</td>
-                      <td className="p-4">{unit.sqft ? `${unit.sqft} sqft` : "-"}</td>
-                      <td className="p-4">${unit.rentAmount.toLocaleString()}/mo</td>
-                      <td className="p-4">
-                        <Badge className={getStatusColor(unit.status)}>{unit.status}</Badge>
-                      </td>
-                      <td className="p-4">
-                        {unit.leases.length > 0 ? (
-                          <div>
-                            <p className="font-medium">{unit.leases[0].tenant.name}</p>
-                            <p className="text-sm text-slate-500">{unit.leases[0].tenant.email}</p>
-                          </div>
-                        ) : unit.tenantInvites.length > 0 ? (
-                          <div className="text-sm">
-                            <span className="text-yellow-600">Invite pending:</span>
-                            <p className="text-slate-500">{unit.tenantInvites[0].email}</p>
-                          </div>
-                        ) : (
-                          <span className="text-slate-400">No tenant</span>
-                        )}
-                      </td>
-                      <td className="p-4">
-                        <div className="flex space-x-1">
-                          {unit.status === "AVAILABLE" && unit.leases.length === 0 && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                              onClick={() => openInviteModal(unit)}
-                            >
-                              <UserPlus className="h-4 w-4" />
-                            </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedUnit({ ...unit })
-                              setShowEditUnitModal(true)
-                            }}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => handleDeleteUnit(unit.id, unit.unitNumber)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        </TabsContent>
+
+        {/* Rent Roll Tab */}
+        <TabsContent value="rent-roll">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <FileText className="h-5 w-5 mr-2" />
+                Rent Roll
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RentRollTable
+                propertyId={id}
+                onInviteTenant={(unitId) => {
+                  const unit = units.find(u => u.id === unitId)
+                  if (unit) openInviteModal(unit)
+                }}
+                onRecordPayment={openPaymentModal}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Leases Tab */}
+        <TabsContent value="leases">
+          <div className="space-y-6">
+            <LeaseExpirationTimeline propertyId={id} monthsAhead={12} />
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  All Leases
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-slate-500">
+                  <Calendar className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+                  <p>Active lease management coming soon</p>
+                  <p className="text-sm mt-2">View lease details, renewals, and amendments</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Documents Tab */}
+        <TabsContent value="documents">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <FileText className="h-5 w-5 mr-2" />
+                Property Documents
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-slate-500">
+                <FileText className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+                <p>Document management coming soon</p>
+                <p className="text-sm mt-2">Upload and manage property-related documents</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Add Unit Modal */}
       {showAddUnitModal && (
@@ -630,6 +750,33 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 </Button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Record Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Record Payment</h2>
+              <button onClick={() => { setShowPaymentModal(false); setSelectedLeaseId(null); }} className="text-slate-400 hover:text-slate-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="text-center py-8 text-slate-500">
+              <p>Payment recording feature coming soon</p>
+              {selectedTenantName && (
+                <p className="text-sm mt-2">For tenant: {selectedTenantName}</p>
+              )}
+            </div>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => { setShowPaymentModal(false); setSelectedLeaseId(null); }}
+            >
+              Close
+            </Button>
           </div>
         </div>
       )}

@@ -21,13 +21,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials")
         }
 
-        // Case-insensitive email lookup
-        const user = await prisma.user.findFirst({
+        // Case-insensitive email lookup (using lowercase)
+        const user = await prisma.user.findUnique({
           where: {
-            email: {
-              equals: credentials.email,
-              mode: 'insensitive'
-            }
+            email: credentials.email.toLowerCase()
           }
         })
 
@@ -58,12 +55,9 @@ export const authOptions: NextAuthOptions = {
         if (!email) return false
 
         // Check if user exists
-        let existingUser = await prisma.user.findFirst({
+        let existingUser = await prisma.user.findUnique({
           where: {
-            email: {
-              equals: email,
-              mode: 'insensitive'
-            }
+            email: email
           }
         })
 
@@ -92,12 +86,9 @@ export const authOptions: NextAuthOptions = {
       }
       // For OAuth, fetch role from database
       if (account?.provider === "google" && token.email) {
-        const dbUser = await prisma.user.findFirst({
+        const dbUser = await prisma.user.findUnique({
           where: {
-            email: {
-              equals: token.email as string,
-              mode: 'insensitive'
-            }
+            email: (token.email as string).toLowerCase()
           }
         })
         if (dbUser) {

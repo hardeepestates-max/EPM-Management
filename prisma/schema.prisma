@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -50,6 +49,8 @@ model Property {
   tickets       Ticket[]
   documents     Document[]
   tenantInvites TenantInvite[]
+  lateFeeConfig LateFeeConfig?
+  expenses      Expense[]
 
   @@map("properties")
 }
@@ -86,11 +87,14 @@ model Lease {
   updatedAt  DateTime @updatedAt
 
   // Relations
-  unitId   String
-  unit     Unit      @relation(fields: [unitId], references: [id])
-  tenantId String
-  tenant   User      @relation("TenantLease", fields: [tenantId], references: [id])
-  payments Payment[]
+  unitId           String
+  unit             Unit              @relation(fields: [unitId], references: [id])
+  tenantId         String
+  tenant           User              @relation("TenantLease", fields: [tenantId], references: [id])
+  payments         Payment[]
+  rentCharges      RentCharge[]
+  recurringCharges RecurringCharge[]
+  paymentAging     PaymentAging?
 
   @@map("leases")
 }
@@ -146,8 +150,9 @@ model Payment {
   updatedAt       DateTime  @updatedAt
 
   // Relations
-  leaseId String
-  lease   Lease  @relation(fields: [leaseId], references: [id])
+  leaseId    String
+  lease      Lease       @relation(fields: [leaseId], references: [id])
+  rentCharge RentCharge?
 
   @@map("payments")
 }
@@ -240,4 +245,98 @@ model TenantInvite {
   property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@map("tenant_invites")
+}
+
+// ============================================
+// RENT ROLL & BILLING MODELS
+// ============================================
+
+model RentCharge {
+  id         String    @id @default(cuid())
+  amount     Float
+  dueDate    DateTime
+  chargeType String    @default("RENT") // RENT, LATE_FEE, UTILITY, PARKING, PET_FEE
+  status     String    @default("UNPAID") // UNPAID, PARTIAL, PAID
+  paidAmount Float     @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  // Relations
+  leaseId   String
+  lease     Lease    @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  paymentId String?  @unique
+  payment   Payment? @relation(fields: [paymentId], references: [id])
+
+  @@map("rent_charges")
+}
+
+model PaymentAging {
+  id          String   @id @default(cuid())
+  current     Float    @default(0) // 0-30 days
+  days30      Float    @default(0) // 31-60 days
+  days60      Float    @default(0) // 61-90 days
+  days90Plus  Float    @default(0) // 90+ days
+  totalDue    Float    @default(0)
+  lastUpdated DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  // Relations
+  leaseId String @unique
+  lease   Lease  @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+
+  @@map("payment_aging")
+}
+
+model RecurringCharge {
+  id         String   @id @default(cuid())
+  chargeType String   // RENT, UTILITY, PARKING, PET_FEE, OTHER
+  amount     Float
+  dayOfMonth Int      @default(1)
+  isActive   Boolean  @default(true)
+  startDate  DateTime @default(now())
+  endDate    DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  leaseId String
+  lease   Lease  @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+
+  @@map("recurring_charges")
+}
+
+model LateFeeConfig {
+  id              String   @id @default(cuid())
+  gracePeriodDays Int      @default(5)
+  feeType         String   @default("FLAT") // FLAT, PERCENTAGE
+  feeAmount       Float    @default(50)
+  maxFeeAmount    Float?   // Cap for percentage-based fees
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  propertyId String?   @unique
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("late_fee_configs")
+}
+
+model Expense {
+  id          String    @id @default(cuid())
+  category    String    // MAINTENANCE, REPAIR, UTILITY, INSURANCE, TAX, MANAGEMENT_FEE, OTHER
+  amount      Float
+  date        DateTime
+  description String?
+  vendorName  String?
+  receiptUrl  String?
+  isRecurring Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("expenses")
 }

@@ -1,8 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { FileText, Download, CreditCard, Clock, CheckCircle, AlertCircle } from "lucide-react"
+import { useSearchParams } from "next/navigation"
+import { FileText, Download, CreditCard, Clock, CheckCircle, AlertCircle, Building, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 interface LineItem {
   description: string
@@ -27,13 +34,24 @@ interface Invoice {
 }
 
 export default function OwnerInvoicesPage() {
+  const searchParams = useSearchParams()
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [processingPayment, setProcessingPayment] = useState(false)
+  const [paymentSuccess, setPaymentSuccess] = useState(false)
 
   useEffect(() => {
     fetchInvoices()
-  }, [])
+
+    // Check for payment success/cancel from URL params
+    if (searchParams.get("success") === "true") {
+      setPaymentSuccess(true)
+      // Remove the query params from URL
+      window.history.replaceState({}, "", "/dashboard/owner/invoices")
+    }
+  }, [searchParams])
 
   const fetchInvoices = async () => {
     try {
@@ -44,6 +62,34 @@ export default function OwnerInvoicesPage() {
       console.error("Error fetching invoices:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePayInvoice = async (paymentMethod: "card" | "ach") => {
+    if (!selectedInvoice) return
+
+    setProcessingPayment(true)
+    try {
+      const res = await fetch(`/api/invoices/${selectedInvoice.id}/pay`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentMethod })
+      })
+
+      const data = await res.json()
+
+      if (res.ok && data.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url
+      } else {
+        alert(data.error || "Failed to initiate payment")
+      }
+    } catch (error) {
+      console.error("Error initiating payment:", error)
+      alert("Failed to initiate payment")
+    } finally {
+      setProcessingPayment(false)
+      setShowPaymentModal(false)
     }
   }
 
@@ -198,7 +244,10 @@ export default function OwnerInvoicesPage() {
                         Download
                       </Button>
                       {selectedInvoice.status !== "PAID" && (
-                        <Button size="sm">
+                        <Button
+                          size="sm"
+                          onClick={() => setShowPaymentModal(true)}
+                        >
                           <CreditCard className="h-4 w-4 mr-2" />
                           Pay Now
                         </Button>
@@ -276,6 +325,87 @@ export default function OwnerInvoicesPage() {
           </div>
         </div>
       )}
+
+      {/* Payment Success Notification */}
+      {paymentSuccess && (
+        <div className="fixed bottom-4 right-4 bg-green-50 border border-green-200 rounded-lg p-4 shadow-lg z-50">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            <div>
+              <p className="font-medium text-green-800">Payment Successful!</p>
+              <p className="text-sm text-green-600">Your invoice has been paid.</p>
+            </div>
+            <button
+              onClick={() => setPaymentSuccess(false)}
+              className="ml-4 text-green-600 hover:text-green-800"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Method Modal */}
+      <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Choose Payment Method</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {selectedInvoice && (
+              <div className="bg-slate-50 rounded-lg p-4 mb-4">
+                <p className="text-sm text-slate-500">Invoice Total</p>
+                <p className="text-2xl font-bold">${selectedInvoice.totalAmount.toFixed(2)}</p>
+                <p className="text-sm text-slate-500">{selectedInvoice.invoiceNumber}</p>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <button
+                onClick={() => handlePayInvoice("card")}
+                disabled={processingPayment}
+                className="w-full flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50"
+              >
+                <div className="flex items-center gap-3">
+                  <CreditCard className="h-5 w-5 text-blue-600" />
+                  <div className="text-left">
+                    <p className="font-medium">Pay with Card</p>
+                    <p className="text-sm text-slate-500">Credit or debit card</p>
+                  </div>
+                </div>
+                {processingPayment ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <span className="text-sm text-slate-500">&rarr;</span>
+                )}
+              </button>
+
+              <button
+                onClick={() => handlePayInvoice("ach")}
+                disabled={processingPayment}
+                className="w-full flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Building className="h-5 w-5 text-green-600" />
+                  <div className="text-left">
+                    <p className="font-medium">Pay with Bank Account (ACH)</p>
+                    <p className="text-sm text-slate-500">Direct bank transfer - Lower fees</p>
+                  </div>
+                </div>
+                {processingPayment ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <span className="text-sm text-slate-500">&rarr;</span>
+                )}
+              </button>
+            </div>
+
+            <p className="text-xs text-center text-slate-500 mt-4">
+              Payments are securely processed by Stripe
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

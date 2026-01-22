@@ -22,6 +22,8 @@ import {
   Receipt,
   DollarSign,
   Wallet,
+  ClipboardList,
+  BarChart3,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -34,22 +36,26 @@ interface NavItem {
 const adminNavItems: NavItem[] = [
   { title: "Dashboard", href: "/dashboard/admin", icon: LayoutDashboard },
   { title: "Properties", href: "/dashboard/admin/properties", icon: Building },
+  { title: "Rent Roll", href: "/dashboard/admin/rent-roll", icon: ClipboardList },
   { title: "Tenants", href: "/dashboard/admin/tenants", icon: UserCheck },
   { title: "Users", href: "/dashboard/admin/users", icon: Users },
   { title: "Tickets", href: "/dashboard/admin/tickets", icon: Ticket },
   { title: "Payments", href: "/dashboard/admin/payments", icon: CreditCard },
   { title: "Billing", href: "/dashboard/admin/billing", icon: DollarSign },
   { title: "Invoices", href: "/dashboard/admin/invoices", icon: Receipt },
+  { title: "Reports", href: "/dashboard/admin/reports", icon: BarChart3 },
   { title: "Documents", href: "/dashboard/admin/documents", icon: FileText },
 ]
 
 const ownerNavItems: NavItem[] = [
   { title: "Dashboard", href: "/dashboard/owner", icon: LayoutDashboard },
   { title: "My Properties", href: "/dashboard/owner/properties", icon: Building },
+  { title: "Rent Roll", href: "/dashboard/owner/rent-roll", icon: ClipboardList },
   { title: "Tenants", href: "/dashboard/owner/tenants", icon: Users },
   { title: "Tickets", href: "/dashboard/owner/tickets", icon: Ticket },
   { title: "Financials", href: "/dashboard/owner/financials", icon: CreditCard },
   { title: "Invoices", href: "/dashboard/owner/invoices", icon: Receipt },
+  { title: "Reports", href: "/dashboard/owner/reports", icon: BarChart3 },
   { title: "Documents", href: "/dashboard/owner/documents", icon: FileText },
 ]
 
