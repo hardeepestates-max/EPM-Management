@@ -36,7 +36,7 @@ export async function sendTenantInviteEmail({
   const greeting = tenantName ? `Hi ${tenantName},` : 'Hi,'
 
   const { data, error } = await getResend().emails.send({
-    from: 'Elevate Property Management <onboarding@resend.dev>',
+    from: 'Elevate Property Management <noreply@elevateproperty.management>',
     to: [to],
     subject: `You're Invited to Join Elevate Property Management`,
     html: `
