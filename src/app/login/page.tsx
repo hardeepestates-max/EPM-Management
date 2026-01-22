@@ -107,9 +107,11 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <a
-              href="/api/auth/signin/google?callbackUrl=/api/auth/callback/redirect"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full"
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => signIn("google", { callbackUrl: "/api/auth/callback/redirect" })}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -130,7 +132,7 @@ export default function LoginPage() {
                 />
               </svg>
               Continue with Google
-            </a>
+            </Button>
 
             <p className="text-sm text-slate-600 text-center">
               Don&apos;t have an account?{" "}
