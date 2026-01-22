@@ -224,6 +224,7 @@ export default function HomePage() {
           </div>
           <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
             <p>&copy; {new Date().getFullYear()} Elevate Property Management. All rights reserved.</p>
+            <p className="text-slate-500 text-sm mt-1">Operated by <a href="https://elevaterealtynj.com" target="_blank" rel="noopener noreferrer" className="hover:text-white">Elevate Realty</a></p>
           </div>
         </div>
       </footer>
