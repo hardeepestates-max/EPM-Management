@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -126,11 +125,9 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() => signIn("google", { callbackUrl: "/api/auth/callback/redirect" })}
+            <a
+              href="/api/auth/signin/google?callbackUrl=/api/auth/callback/redirect"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -151,7 +148,7 @@ export default function RegisterPage() {
                 />
               </svg>
               Continue with Google
-            </Button>
+            </a>
 
             <p className="text-sm text-slate-600 text-center">
               Already have an account?{" "}
