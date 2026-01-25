@@ -18,13 +18,30 @@ export const metadata: Metadata = {
   description: "Professional property management services in Cliffside Park, Bergen County & Northern New Jersey. Tenant screening, maintenance, rent collection & 24/7 support. 10+ years experience.",
   keywords: ["property management", "Cliffside Park", "Bergen County", "North Jersey", "NJ property management", "tenant management", "landlord services", "rent collection", "maintenance services"],
   authors: [{ name: "Elevate Property Management" }],
+  icons: {
+    icon: [
+      { url: "/icon.png", sizes: "500x500", type: "image/png" },
+      { url: "/favicon.png", sizes: "500x500", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "500x500", type: "image/png" },
+    ],
+  },
   openGraph: {
     title: "Elevate Property Management | North Jersey Property Experts",
     description: "Professional property management in Cliffside Park & Bergen County, NJ. Trusted by property owners for 10+ years.",
-    url: "https://elevateproperty.management",
+    url: "https://www.elevateproperty.management",
     siteName: "Elevate Property Management",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "https://www.elevateproperty.management/logo.png",
+        width: 500,
+        height: 500,
+        alt: "Elevate Property Management Logo",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -36,7 +53,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: "https://elevateproperty.management",
+    canonical: "https://www.elevateproperty.management",
   },
 };
 
@@ -45,7 +62,7 @@ const jsonLd = {
   "@type": "LocalBusiness",
   "name": "Elevate Property Management",
   "description": "Professional property management services in Cliffside Park, Bergen County & Northern New Jersey.",
-  "url": "https://elevateproperty.management",
+  "url": "https://www.elevateproperty.management",
   "telephone": "+1-201-887-7766",
   "email": "elevatepropertymanagement@outlook.com",
   "address": {
