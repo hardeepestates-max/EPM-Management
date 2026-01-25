@@ -106,6 +106,78 @@ export async function sendTenantInviteEmail({
   return data
 }
 
+interface MagicLinkEmailProps {
+  to: string
+  magicLink: string
+}
+
+export async function sendMagicLinkEmail({
+  to,
+  magicLink
+}: MagicLinkEmailProps) {
+  const { data, error } = await getResend().emails.send({
+    from: 'Elevate Property Management <noreply@elevateproperty.management>',
+    to: [to],
+    subject: 'Your Login Link - Elevate Property Management',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #334155; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #0f172a; margin: 0; font-size: 24px;">Elevate Property Management</h1>
+          </div>
+
+          <div style="background: #f8fafc; border-radius: 12px; padding: 30px; margin-bottom: 20px;">
+            <p style="margin: 0 0 20px 0; font-size: 16px;">Hi,</p>
+
+            <p style="margin: 0 0 20px 0; font-size: 16px;">
+              You requested a login link for your Elevate Property Management account.
+            </p>
+
+            <p style="margin: 0 0 25px 0; font-size: 16px;">
+              Click the button below to sign in:
+            </p>
+
+            <div style="text-align: center; margin-bottom: 25px;">
+              <a href="${magicLink}" style="display: inline-block; background: #2563eb; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                Sign In to Your Account
+              </a>
+            </div>
+
+            <p style="margin: 0; font-size: 14px; color: #64748b; text-align: center;">
+              Or copy and paste this link into your browser:<br>
+              <a href="${magicLink}" style="color: #2563eb; word-break: break-all;">${magicLink}</a>
+            </p>
+          </div>
+
+          <p style="color: #94a3b8; font-size: 14px; margin: 0 0 10px 0;">
+            This link will expire in 15 minutes. If you didn't request this email, you can safely ignore it.
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
+
+          <p style="color: #94a3b8; font-size: 12px; margin: 0; text-align: center;">
+            Elevate Property Management<br>
+            North Jersey Property Management Services<br>
+            <a href="https://elevateproperty.management" style="color: #2563eb;">elevateproperty.management</a>
+          </p>
+        </body>
+      </html>
+    `,
+  })
+
+  if (error) {
+    console.error('Error sending magic link email:', error)
+    throw error
+  }
+
+  return data
+}
+
 interface BulkEmailProps {
   to: string
   recipientName?: string

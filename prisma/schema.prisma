@@ -360,3 +360,20 @@ model BulkEmail {
 
   @@map("bulk_emails")
 }
+
+// ============================================
+// MAGIC LINK AUTHENTICATION
+// ============================================
+
+model MagicLinkToken {
+  id        String    @id @default(cuid())
+  token     String    @unique @default(cuid())
+  email     String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email])
+  @@index([token])
+  @@map("magic_link_tokens")
+}
