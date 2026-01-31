@@ -138,6 +138,37 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Partner Section */}
+      <section className="py-8 px-4 bg-black">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-xs uppercase tracking-wider text-slate-400 mb-3">Partnered Real Estate Brokerage</p>
+          <a
+            href="https://elevaterealtynj.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block hover:opacity-80 transition-opacity"
+          >
+            <Image
+              src="/elevate-realty-logo.png"
+              alt="Elevate Realty"
+              width={160}
+              height={60}
+              className="mx-auto"
+            />
+          </a>
+          <p className="text-slate-500 text-sm mt-2">
+            <a
+              href="https://elevaterealtynj.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Visit Elevate Realty →
+            </a>
+          </p>
+        </div>
+      </section>
+
       {/* Contact Section */}
       <section id="contact" className="py-20 px-4 bg-slate-50">
         <div className="max-w-7xl mx-auto">
