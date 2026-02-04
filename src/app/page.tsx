@@ -15,8 +15,8 @@ export default function HomePage() {
               <Link href="/" className="flex items-center space-x-2">
                 <Image src="/logo.png" alt="EPM Logo" width={40} height={40} className="w-9 h-9 sm:w-10 sm:h-10" />
                 <span className="font-bold text-slate-900">
-                  <span className="hidden sm:inline text-lg">ELEVATE Property Management</span>
-                  <span className="sm:hidden text-base">ELEVATE PM</span>
+                  <span className="hidden sm:inline text-lg">Elevate Property Management</span>
+                  <span className="sm:hidden text-base">Elevate PM</span>
                 </span>
               </Link>
               <div className="hidden md:flex items-center space-x-6 ml-10">
