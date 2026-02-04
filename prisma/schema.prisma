@@ -8,15 +8,17 @@ datasource db {
 }
 
 model User {
-  id              String    @id @default(cuid())
-  email           String    @unique
-  password        String
-  name            String
-  phone           String?
-  role            String    @default("TENANT")
-  stripeCustomerId String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  password             String
+  name                 String
+  phone                String?
+  role                 String    @default("TENANT")
+  stripeCustomerId     String?
+  stripeConnectId      String?   // Stripe Connect account for receiving payouts (owners)
+  stripeConnectStatus  String?   // "pending", "active", "restricted", etc.
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   // Relations
   ownedProperties  Property[]      @relation("PropertyOwner")
@@ -27,6 +29,7 @@ model User {
   billingSettings  OwnerBillingSettings?
   invoices         Invoice[]
   bulkEmails       BulkEmail[]
+  expenses         Expense[]       @relation("OwnerExpenses")
 
   @@map("users")
 }
@@ -325,12 +328,13 @@ model LateFeeConfig {
 
 model Expense {
   id          String    @id @default(cuid())
-  category    String    // MAINTENANCE, REPAIR, UTILITY, INSURANCE, TAX, MANAGEMENT_FEE, OTHER
+  category    String    // MAINTENANCE, REPAIRS, UTILITIES, INSURANCE, TAX, MORTGAGE, HOA, LEGAL, ADVERTISING, OTHER
   amount      Float
   date        DateTime
   description String?
   vendorName  String?
   receiptUrl  String?
+  notes       String?
   isRecurring Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -338,7 +342,12 @@ model Expense {
   // Relations
   propertyId String?
   property   Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  ownerId    String?
+  owner      User?     @relation("OwnerExpenses", fields: [ownerId], references: [id])
 
+  @@index([ownerId])
+  @@index([propertyId])
+  @@index([date])
   @@map("expenses")
 }
 

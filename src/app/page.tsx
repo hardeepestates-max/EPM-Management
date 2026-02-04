@@ -14,9 +14,9 @@ export default function HomePage() {
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-2">
                 <Image src="/logo.png" alt="EPM Logo" width={40} height={40} className="w-9 h-9 sm:w-10 sm:h-10" />
-                <span className="text-lg font-bold text-slate-900">
-                  <span className="hidden sm:inline">Elevate PM</span>
-                  <span className="sm:hidden">EPM</span>
+                <span className="font-bold text-slate-900">
+                  <span className="hidden sm:inline text-lg">ELEVATE Property Management</span>
+                  <span className="sm:hidden text-base">ELEVATE PM</span>
                 </span>
               </Link>
               <div className="hidden md:flex items-center space-x-6 ml-10">
@@ -230,7 +230,7 @@ export default function HomePage() {
                 </li>
                 <li className="flex items-center space-x-2">
                   <Mail className="h-4 w-4 flex-shrink-0" />
-                  <a href="mailto:elevatepropertymanagement@outlook.com" className="hover:text-white break-all">
+                  <a href="mailto:elevatepropertymanagement@outlook.com" className="hover:text-white text-sm whitespace-nowrap">
                     elevatepropertymanagement@outlook.com
                   </a>
                 </li>

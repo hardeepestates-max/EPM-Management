@@ -25,6 +25,8 @@ import {
   ClipboardList,
   BarChart3,
   Mail,
+  PiggyBank,
+  Landmark,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -56,6 +58,8 @@ const ownerNavItems: NavItem[] = [
   { title: "Tenants", href: "/dashboard/owner/tenants", icon: Users },
   { title: "Tickets", href: "/dashboard/owner/tickets", icon: Ticket },
   { title: "Financials", href: "/dashboard/owner/financials", icon: CreditCard },
+  { title: "Expenses", href: "/dashboard/owner/expenses", icon: PiggyBank },
+  { title: "Payouts", href: "/dashboard/owner/payouts", icon: Landmark },
   { title: "Invoices", href: "/dashboard/owner/invoices", icon: Receipt },
   { title: "Reports", href: "/dashboard/owner/reports", icon: BarChart3 },
   { title: "Documents", href: "/dashboard/owner/documents", icon: FileText },

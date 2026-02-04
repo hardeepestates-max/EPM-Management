@@ -106,7 +106,7 @@ export async function POST(request: Request) {
       })
     }
 
-    // Create checkout session
+    // Create checkout session with Financial Connections for ACH
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
       mode: "payment",
@@ -120,6 +120,17 @@ export async function POST(request: Request) {
         convenienceFee: convenienceFee.toString(),
         totalAmount: totalAmount.toString(),
       },
+      // Enable instant bank verification via Financial Connections for ACH
+      ...(paymentMethod === "ach" && {
+        payment_method_options: {
+          us_bank_account: {
+            financial_connections: {
+              permissions: ["payment_method"],
+            },
+            verification_method: "instant",
+          },
+        },
+      }),
     })
 
     return NextResponse.json({

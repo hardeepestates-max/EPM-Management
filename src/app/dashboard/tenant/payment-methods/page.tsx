@@ -11,7 +11,10 @@ import {
   EyeOff,
   CheckCircle,
   AlertCircle,
-  Loader2
+  Loader2,
+  Zap,
+  Clock,
+  ShieldCheck
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -42,6 +45,7 @@ interface PaymentMethod {
   expYear?: number
   accountType?: string
   isDefault: boolean
+  verificationStatus?: string // "verified" | "pending" | "unverified"
 }
 
 export default function PaymentMethodsPage() {
@@ -83,13 +87,17 @@ export default function PaymentMethodsPage() {
     })
   }
 
-  const handleAddPaymentMethod = async (type: "card" | "bank") => {
-    setAddingMethod(type)
+  const handleAddPaymentMethod = async (type: "card" | "bank" | "bank-instant") => {
+    setAddingMethod(type === "bank-instant" ? "bank" : type)
     setProcessing(true)
 
     try {
-      // Create setup intent
-      const res = await fetch("/api/payments/setup-intent", {
+      // Use different endpoint for instant bank verification
+      const endpoint = type === "bank-instant"
+        ? "/api/payments/setup-bank"
+        : "/api/payments/setup-intent"
+
+      const res = await fetch(endpoint, {
         method: "POST",
       })
       const { clientSecret } = await res.json()
@@ -106,8 +114,7 @@ export default function PaymentMethodsPage() {
         throw new Error("Failed to load Stripe")
       }
 
-      // For now, redirect to Stripe's hosted page for adding payment methods
-      // In production, you'd use Stripe Elements for a seamless experience
+      // Redirect to Stripe's hosted page for adding payment methods
       const { error } = await stripe.confirmSetup({
         clientSecret,
         confirmParams: {
@@ -252,9 +259,23 @@ export default function PaymentMethodsPage() {
                       </>
                     ) : (
                       <>
-                        <p className="font-medium text-slate-900">
-                          {method.bankName || "Bank Account"}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-slate-900">
+                            {method.bankName || "Bank Account"}
+                          </p>
+                          {method.verificationStatus === "verified" && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                              <ShieldCheck className="h-3 w-3" />
+                              Verified
+                            </span>
+                          )}
+                          {method.verificationStatus === "pending" && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium">
+                              <Clock className="h-3 w-3" />
+                              Pending
+                            </span>
+                          )}
+                        </div>
                         <p className="text-slate-600 font-mono text-sm">
                           Account ending in {isVisible ? method.last4 : "****"}
                         </p>
@@ -322,6 +343,31 @@ export default function PaymentMethodsPage() {
           </DialogHeader>
 
           <div className="space-y-3 py-4">
+            {/* Instant Bank Verification - Recommended */}
+            <button
+              onClick={() => handleAddPaymentMethod("bank-instant")}
+              disabled={processing}
+              className="w-full p-4 border-2 border-green-200 bg-green-50 rounded-lg flex items-center space-x-4 hover:bg-green-100 transition-colors disabled:opacity-50"
+            >
+              <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <Zap className="h-6 w-6 text-green-600" />
+              </div>
+              <div className="flex-1 text-left">
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-slate-900">Instant Bank Verification</p>
+                  <span className="px-2 py-0.5 rounded-full bg-green-200 text-green-800 text-xs font-medium">
+                    Recommended
+                  </span>
+                </div>
+                <p className="text-sm text-green-600">Free - Verify instantly, pay today</p>
+                <p className="text-xs text-slate-500 mt-1">Connect your bank securely via Plaid</p>
+              </div>
+              {processing && addingMethod === "bank" && (
+                <Loader2 className="h-5 w-5 animate-spin text-green-600" />
+              )}
+            </button>
+
+            {/* Regular Bank Account with micro-deposits */}
             <button
               onClick={() => handleAddPaymentMethod("bank")}
               disabled={processing}
@@ -331,8 +377,9 @@ export default function PaymentMethodsPage() {
                 <Landmark className="h-6 w-6 text-blue-600" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium text-slate-900">Bank Account (ACH)</p>
-                <p className="text-sm text-green-600">Free - No fees</p>
+                <p className="font-medium text-slate-900">Bank Account (Manual)</p>
+                <p className="text-sm text-slate-500">Free - Takes 2-3 days to verify</p>
+                <p className="text-xs text-slate-400 mt-1">Verify via micro-deposits</p>
               </div>
               {processing && addingMethod === "bank" && (
                 <Loader2 className="h-5 w-5 animate-spin" />

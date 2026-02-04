@@ -41,14 +41,26 @@ export async function GET() {
         expYear: pm.card?.exp_year,
         isDefault: false,
       })),
-      ...bankAccounts.data.map((pm) => ({
-        id: pm.id,
-        type: "bank" as const,
-        bankName: pm.us_bank_account?.bank_name || "Bank Account",
-        last4: pm.us_bank_account?.last4 || "****",
-        accountType: pm.us_bank_account?.account_type,
-        isDefault: false,
-      })),
+      ...bankAccounts.data.map((pm) => {
+        // Map Stripe's status_details to our verification status
+        const statusDetails = pm.us_bank_account?.status_details
+        let verificationStatus = "verified"
+        if (statusDetails?.blocked) {
+          verificationStatus = "blocked"
+        } else if (pm.us_bank_account?.financial_connections_account) {
+          verificationStatus = "verified" // Instant verification via Financial Connections
+        }
+
+        return {
+          id: pm.id,
+          type: "bank" as const,
+          bankName: pm.us_bank_account?.bank_name || "Bank Account",
+          last4: pm.us_bank_account?.last4 || "****",
+          accountType: pm.us_bank_account?.account_type,
+          isDefault: false,
+          verificationStatus,
+        }
+      }),
     ]
 
     return NextResponse.json({ paymentMethods })
